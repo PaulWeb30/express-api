@@ -9,7 +9,14 @@ module.exports = {
 			const errors = validationResult(req)
 
 			if (!errors.isEmpty()) {
-				return next(new ApiError(errors.array(), BAD_REQUEST))
+				const errorMessages = errors
+					.array()
+					.map(error => error.msg)
+					.join(', ')
+
+				const errorMessage = `Validation failed: ${errorMessages}`
+
+				return next(new ApiError(errorMessage, BAD_REQUEST))
 			}
 
 			next()

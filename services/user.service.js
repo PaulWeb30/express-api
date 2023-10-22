@@ -1,10 +1,13 @@
 const { UserModel } = require('../models/index')
 
 module.exports = {
+	getAll: () => {
+		return UserModel.find().select('-passwordHash')
+	},
 	getOneByParams: filter => {
 		return UserModel.findOne(filter)
 	},
-	getOneById: (id) => {
+	getOneById: id => {
 		return UserModel.findById(id)
 	},
 	deleteUser: userId => {

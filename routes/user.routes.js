@@ -7,17 +7,26 @@ const { userMdlwr, commonMdlwr } = require('../middlewares/index')
 
 const router = express.Router()
 
-router.get('/getAll', UserController.getAll)
-router.patch(
-	'/update/:userId',
+router.get('/all', UserController.getAll)
+router.get(
+	'/:userId',
 	commonMdlwr.checkIsIdValid('userId'),
-	userMdlwr.checkUserExistence,
+	userMdlwr.getUserDynamicaly('params', 'userId', '_id'),
+	UserController.getOne
+)
+router.patch(
+	'/:userId',
+	commonMdlwr.checkIsIdValid('userId'),
+	signupValidation,
+	commonMdlwr.handleValidationErrors,
+	userMdlwr.getUserDynamicaly('params', 'userId', '_id'),
+	userMdlwr.checkEmailUniqueness,
 	UserController.update
 )
 router.delete(
-	'/delete/:userId',
+	'/:userId',
 	commonMdlwr.checkIsIdValid('userId'),
-	userMdlwr.checkUserExistence,
+	userMdlwr.getUserDynamicaly('params', 'userId', '_id'),
 	UserController.delete
 )
 

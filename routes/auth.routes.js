@@ -14,6 +14,7 @@ router.post(
 	'/login',
 	loginValidation,
 	commonMdlwr.handleValidationErrors,
+	userMdlwr.getUserDynamicaly('body', 'email', 'email'),
 	AuthController.login
 )
 router.post(
