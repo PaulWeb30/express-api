@@ -6,7 +6,7 @@ const {
 	signupValidation,
 } = require('../validations/auth.validation')
 
-const { userMdlwr, commonMdlwr } = require('../middlewares/index')
+const { userMdlwr, commonMdlwr, authMdlwr } = require('../middlewares/index')
 
 const router = express.Router()
 
@@ -24,5 +24,9 @@ router.post(
 	userMdlwr.checkEmailUniqueness,
 	AuthController.signup
 )
+
+router.post('/refresh', authMdlwr.checkIsRefreshToken, AuthController.refresh)
+
+router.post('/logout', authMdlwr.checkIsAccessToken, AuthController.logout)
 
 module.exports = router

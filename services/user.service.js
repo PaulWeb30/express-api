@@ -1,6 +1,9 @@
 const { UserModel } = require('../models/index')
 
 module.exports = {
+	createUser: userObject => {
+		return UserModel.create(userObject)
+	},
 	getAll: () => {
 		return UserModel.find().select('-passwordHash')
 	},
@@ -10,10 +13,10 @@ module.exports = {
 	getOneById: id => {
 		return UserModel.findById(id)
 	},
-	deleteUser: userId => {
-		return UserModel.deleteOne({ _id: userId })
+	deleteUser: filter => {
+		return UserModel.deleteOne(filter)
 	},
 	updateUser: (userId, newObject) => {
-		return UserModel.updateOne({ _id: userId }, newObject, { new: true })
+		return UserModel.findOneAndUpdate({ _id: userId }, newObject, { new: true })
 	},
 }

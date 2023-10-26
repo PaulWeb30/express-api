@@ -8,30 +8,16 @@ module.exports = {
 			const { email } = req.body
 			const { userId } = req.params
 
-			const isCurrentUser = await userService.getOneByParams({ email })
+			const isCurrentUser = await userService.getOneByParams({
+				email,
+				_id: { $ne: userId },
+			})
 
-			if (isCurrentUser && isCurrentUser._id.toString() !== userId) {
+			if (isCurrentUser) {
 				return next(
 					new ApiError('User with this E-Mail already exists', CONFLICT)
 				)
 			}
-
-			next()
-		} catch (e) {
-			next(e)
-		}
-	},
-	checkUserExistence: async (req, res, next) => {
-		try {
-			const { userId } = req.params
-
-			const user = await userService.getOneById(userId)
-
-			if (!user) {
-				return next(new ApiError('User not found', NOT_FOUND))
-			}
-
-			req.user = user
 
 			next()
 		} catch (e) {

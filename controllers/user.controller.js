@@ -1,12 +1,12 @@
 const userService = require('../services/user.service')
-const { OK } = require('../constants/statusCodes')
+const { statusCodes } = require('../constants')
+
 module.exports = {
 	getAll: async (req, res, next) => {
 		try {
 			const users = await userService.getAll()
 
-			res.status(OK).json(users)
-			next()
+			res.status(statusCodes.OK).json(users)
 		} catch (e) {
 			next(e)
 		}
@@ -14,8 +14,8 @@ module.exports = {
 	getOne: async (req, res, next) => {
 		try {
 			const user = req.user
-			res.status(OK).json(user)
-			next()
+
+			res.status(statusCodes.OK).json(user)
 		} catch (e) {
 			next(e)
 		}
@@ -26,8 +26,7 @@ module.exports = {
 
 			const user = await userService.updateUser(userId, req.body)
 
-			res.status(OK).json(user)
-			next()
+			res.status(statusCodes.OK).json(user)
 		} catch (e) {
 			next(e)
 		}
@@ -36,10 +35,9 @@ module.exports = {
 		try {
 			const { userId } = req.params
 
-			await userService.deleteUser(userId)
+			await userService.deleteUser({ _id: userId })
 
-			res.status(OK).json({ userId })
-			next()
+			res.status(statusCodes.OK).json({ userId })
 		} catch (e) {
 			next(e)
 		}

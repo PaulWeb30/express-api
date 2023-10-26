@@ -1,7 +1,8 @@
 const { isObjectIdOrHexString } = require('mongoose')
+
 const { validationResult } = require('express-validator')
 const { BAD_REQUEST } = require('../constants/statusCodes')
-const ApiError = require('../utils/ApiError')
+const { ApiError } = require('../utils')
 
 module.exports = {
 	handleValidationErrors: (req, res, next) => {
