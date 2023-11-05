@@ -30,8 +30,6 @@ router.post('/refresh', authMdlwr.checkIsRefreshToken, AuthController.refresh)
 
 router.post('/logout', authMdlwr.checkIsAccessToken, AuthController.logout)
 
-router.patch('/email/verification', AuthController.emailVerification)
-
 router.post(
 	'/password/forgot',
 	userMdlwr.getUserDynamicaly('body', 'email', 'email'),
@@ -42,6 +40,14 @@ router.patch(
 	'/password/forgot',
 	authMdlwr.checkIsActionToken(tokenType.FORGOT_PASS),
 	AuthController.setNewPassword
+)
+
+router.get(
+	'/email/verification/:userId/:token',
+	commonMdlwr.checkIsIdValid('userId', 'params'),
+	userMdlwr.getUserDynamicaly('params', 'userId', '_id'),
+	authMdlwr.checkIsActionToken(tokenType.EMAIL_VERIF),
+	AuthController.emailVerification
 )
 
 module.exports = router

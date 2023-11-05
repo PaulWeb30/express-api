@@ -24,6 +24,19 @@ module.exports = {
 			next(e)
 		}
 	},
+	checkEmailIsVerified: async (req, res, next) => {
+		try {
+			const { verified } = req.user
+
+			if (!verified) {
+				return next(new ApiError("User email isn't verified", CONFLICT))
+			}
+
+			next()
+		} catch (e) {
+			next(e)
+		}
+	},
 	getUserDynamicaly: (
 		from = 'body',
 		fieldName = 'userId',

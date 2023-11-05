@@ -20,6 +20,7 @@ router.patch(
 	signupValidation,
 	commonMdlwr.handleValidationErrors,
 	userMdlwr.getUserDynamicaly('params', 'userId', '_id'),
+	userMdlwr.checkEmailIsVerified,
 	userMdlwr.checkEmailUniqueness,
 	authMdlwr.checkIsAccessToken,
 	UserController.update

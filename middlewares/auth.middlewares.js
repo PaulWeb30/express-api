@@ -51,13 +51,13 @@ module.exports = {
 	},
 	checkIsActionToken: typeOfToken => async (req, res, next) => {
 		try {
-			const action_token = req.get(constant.AUTHORIZATION)
+			const action_token = req.get(constant.AUTHORIZATION) || req.params.token
 
 			if (!action_token) {
 				return next(new ApiError('No token', statusCodes.UNAUTHORIZED))
 			}
 
-			tokenService.verifyToken(action_token, tokenType.FORGOT_PASS)
+			tokenService.verifyToken(action_token, typeOfToken)
 
 			const tokenInfo = await tokenService.getOneWithUser(
 				{ tokenType: typeOfToken, token: action_token },

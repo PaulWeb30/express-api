@@ -15,7 +15,7 @@ const { FRONTEND_URL } = require('../config/config')
 module.exports = {
 	signup: async (req, res, next) => {
 		try {
-			const { email, password, fullName } = req.body
+			const { email, password } = req.body
 
 			const passwordHash = await authService.hashPassword(password)
 
@@ -26,13 +26,24 @@ module.exports = {
 
 			const authTokens = tokenService.generateAuthTokens({ _id: user._id })
 
-			await emailService.sendEmail(email, emailAction.WELCOME, {
-				userName: fullName,
-			})
+			const action_token = tokenService.generateActionToken(
+				tokenType.EMAIL_VERIF,
+				{ _id: user._id }
+			)
 
-			// await emailService.sendEmail(email, constant.EMAIL_VERIFICATION, {
-			// 	userName: fullName,
-			// })
+			await tokenService.saveTokens(
+				{
+					token: action_token,
+					tokenType: tokenType.EMAIL_VERIF,
+					user: user._id,
+				},
+				constant.ACTION
+			)
+
+			const url = `http://localhost:4444/api/auth/email/verification/${user._id}/${action_token}`
+			await emailService.sendEmail(email, emailAction.EMAIL_VERIFICATION, {
+				url,
+			})
 
 			res.status(statusCodes.CREATED).json({
 				...authTokens,
@@ -44,7 +55,7 @@ module.exports = {
 	},
 	login: async (req, res, next) => {
 		try {
-			const { password, email } = req.body
+			const { password } = req.body
 			const { passwordHash, _id } = req.user
 
 			await authService.comparePasswords(password, passwordHash)
@@ -92,7 +103,11 @@ module.exports = {
 	},
 	emailVerification: async (req, res, next) => {
 		try {
-			res.status(statusCodes.OK).json('success')
+			const { user } = req.tokenInfo
+
+			await userService.updateUserById(user._id, { verified: true })
+
+			res.status(statusCodes.OK).json('Email was successfull verified!')
 		} catch (e) {
 			next(e)
 		}

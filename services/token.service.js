@@ -26,7 +26,7 @@ module.exports = {
 			refresh_token,
 		}
 	},
-	generateActionToken: (tokenType, payload) => {
+	generateActionToken: (typeOfToken, payload) => {
 		return jwt.sign(payload, FORGOT_PASS_TOKEN_SECRET, {
 			expiresIn: '1d',
 		})
@@ -87,10 +87,12 @@ module.exports = {
 				case tokenType.FORGOT_PASS:
 					secretWord = FORGOT_PASS_TOKEN_SECRET
 					break
+				case tokenType.EMAIL_VERIF:
+					secretWord = FORGOT_PASS_TOKEN_SECRET
+					break
 				default:
 					throw new ApiError('Token type not found', statusCodes.UNAUTHORIZED)
 			}
-			console.log(secretWord) // Додайте цей рядок для перевірки, який секретний ключ використовується
 
 			return jwt.verify(token, secretWord)
 		} catch (e) {
