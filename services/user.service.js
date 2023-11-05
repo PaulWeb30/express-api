@@ -10,13 +10,10 @@ module.exports = {
 	getOneByParams: filter => {
 		return UserModel.findOne(filter)
 	},
-	getOneById: id => {
-		return UserModel.findById(id)
-	},
 	deleteUser: filter => {
 		return UserModel.deleteOne(filter)
 	},
-	updateUser: (userId, newObject) => {
+	updateUserById: (userId, newObject) => {
 		return UserModel.findOneAndUpdate({ _id: userId }, newObject, { new: true })
 	},
 }

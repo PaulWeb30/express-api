@@ -1,10 +1,21 @@
-const { authService, tokenService, userService } = require('../services/index')
-const { statusCodes } = require('../constants')
+const {
+	authService,
+	tokenService,
+	userService,
+	emailService,
+} = require('../services/index')
+const {
+	statusCodes,
+	emailAction,
+	tokenType,
+	constant,
+} = require('../constants')
+const { FRONTEND_URL } = require('../config/config')
 
 module.exports = {
 	signup: async (req, res, next) => {
 		try {
-			const { password } = req.body
+			const { email, password, fullName } = req.body
 
 			const passwordHash = await authService.hashPassword(password)
 
@@ -14,6 +25,14 @@ module.exports = {
 			})
 
 			const authTokens = tokenService.generateAuthTokens({ _id: user._id })
+
+			await emailService.sendEmail(email, emailAction.WELCOME, {
+				userName: fullName,
+			})
+
+			// await emailService.sendEmail(email, constant.EMAIL_VERIFICATION, {
+			// 	userName: fullName,
+			// })
 
 			res.status(statusCodes.CREATED).json({
 				...authTokens,
@@ -25,14 +44,14 @@ module.exports = {
 	},
 	login: async (req, res, next) => {
 		try {
-			const { password } = req.body
+			const { password, email } = req.body
 			const { passwordHash, _id } = req.user
 
 			await authService.comparePasswords(password, passwordHash)
 
 			const authTokens = tokenService.generateAuthTokens({ _id })
 
-			await tokenService.saveAuthTokens({ ...authTokens, user: _id })
+			await tokenService.saveTokens({ ...authTokens, user: _id })
 
 			res.status(statusCodes.OK).json({
 				...authTokens,
@@ -51,7 +70,7 @@ module.exports = {
 
 			const authTokens = tokenService.generateAuthTokens({ _id: user })
 
-			await tokenService.saveAuthTokens({ ...authTokens, user })
+			await tokenService.saveTokens({ ...authTokens, user })
 
 			res.status(statusCodes.OK).json({
 				...authTokens,
@@ -66,7 +85,52 @@ module.exports = {
 
 			await tokenService.deleteOneByParams({ user: user._id, access_token })
 
-			res.status(statusCodes.NO_CONTENT).json('success')
+			res.status(statusCodes.OK).json('success')
+		} catch (e) {
+			next(e)
+		}
+	},
+	emailVerification: async (req, res, next) => {
+		try {
+			res.status(statusCodes.OK).json('success')
+		} catch (e) {
+			next(e)
+		}
+	},
+	forgotPassword: async (req, res, next) => {
+		try {
+			const { email, _id } = req.user
+
+			const action_token = tokenService.generateActionToken(
+				tokenType.FORGOT_PASS,
+				{ _id }
+			)
+
+			await tokenService.saveTokens(
+				{ token: action_token, tokenType: tokenType.FORGOT_PASS, user: _id },
+				constant.ACTION
+			)
+
+			const url = `${FRONTEND_URL}/password/forgot?token=${action_token}`
+			await emailService.sendEmail(email, emailAction.FORGOT_PASS, { url })
+
+			res.status(statusCodes.OK).json('success')
+		} catch (e) {
+			next(e)
+		}
+	},
+	setNewPassword: async (req, res, next) => {
+		try {
+			const { password } = req.body
+			const { user, token } = req.tokenInfo
+
+			const passwordHash = await authService.hashPassword(password)
+			await userService.updateUserById(user._id, { passwordHash })
+
+			await tokenService.deleteMany({ user: user._id })
+			await tokenService.deleteOneByParams({ token }, constant.ACTION)
+
+			res.status(statusCodes.OK).json('success')
 		} catch (e) {
 			next(e)
 		}

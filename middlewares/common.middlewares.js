@@ -29,7 +29,7 @@ module.exports = {
 		return async (req, res, next) => {
 			try {
 				if (!isObjectIdOrHexString(req[from][fieldName])) {
-					return next(new ApiError("User's id is not valid", BAD_REQUEST))
+					return next(new ApiError('User\'s id is not valid', BAD_REQUEST))
 				}
 				next()
 			} catch (e) {

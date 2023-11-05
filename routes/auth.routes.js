@@ -5,6 +5,7 @@ const {
 	loginValidation,
 	signupValidation,
 } = require('../validations/auth.validation')
+const { tokenType } = require('../constants')
 
 const { userMdlwr, commonMdlwr, authMdlwr } = require('../middlewares/index')
 
@@ -28,5 +29,19 @@ router.post(
 router.post('/refresh', authMdlwr.checkIsRefreshToken, AuthController.refresh)
 
 router.post('/logout', authMdlwr.checkIsAccessToken, AuthController.logout)
+
+router.patch('/email/verification', AuthController.emailVerification)
+
+router.post(
+	'/password/forgot',
+	userMdlwr.getUserDynamicaly('body', 'email', 'email'),
+	AuthController.forgotPassword
+)
+
+router.patch(
+	'/password/forgot',
+	authMdlwr.checkIsActionToken(tokenType.FORGOT_PASS),
+	AuthController.setNewPassword
+)
 
 module.exports = router

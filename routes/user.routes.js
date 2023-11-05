@@ -7,7 +7,7 @@ const { userMdlwr, commonMdlwr, authMdlwr } = require('../middlewares/index')
 
 const router = express.Router()
 
-router.get('/all', UserController.getAll)
+router.get('/', UserController.getAll)
 router.get(
 	'/:userId',
 	commonMdlwr.checkIsIdValid('userId'),

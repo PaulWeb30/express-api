@@ -17,6 +17,10 @@ const UserSchema = new Schema(
 			type: String,
 			required: true,
 		},
+		emailIsVerified: {
+			type: Boolean,
+			default: false,
+		},
 		avatarUrl: String,
 	},
 	{

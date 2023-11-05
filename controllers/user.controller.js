@@ -24,7 +24,7 @@ module.exports = {
 		try {
 			const { userId } = req.params
 
-			const user = await userService.updateUser(userId, req.body)
+			const user = await userService.updateUserById(userId, req.body)
 
 			res.status(statusCodes.OK).json(user)
 		} catch (e) {

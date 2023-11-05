@@ -5,11 +5,12 @@ const {
 	REFRESH_SECRET,
 	ACCESS_EXPIRES,
 	REFRESH_EXPIRES,
+	FORGOT_PASS_TOKEN_SECRET,
 } = require('../config/config')
 
 const { AuthModel } = require('../models/index')
 const { ApiError } = require('../utils/index')
-const { statusCodes, constant } = require('../constants/index')
+const { statusCodes, modelType, tokenType, constant } = require('../constants')
 
 module.exports = {
 	generateAuthTokens: payload => {
@@ -25,24 +26,71 @@ module.exports = {
 			refresh_token,
 		}
 	},
-	saveAuthTokens: tokensObject => {
-		return AuthModel.create(tokensObject)
+	generateActionToken: (tokenType, payload) => {
+		return jwt.sign(payload, FORGOT_PASS_TOKEN_SECRET, {
+			expiresIn: '1d',
+		})
 	},
-	deleteOneByParams: filter => {
-		return AuthModel.deleteOne(filter)
-	},
-	getOneWithUser: filter => {
-		return AuthModel.findOne(filter).populate('user')
-	},
-	getOne: filter => {
-		return AuthModel.findOne(filter)
-	},
-	verifyAuthToken: (token, tokenType = constant.ACCESS) => {
-		try {
-			let secretWord
+	saveTokens: (tokensObject, modelName = constant.AUTH) => {
+		const model = modelType[modelName]
 
-			if (tokenType === constant.ACCESS) secretWord = ACCESS_SECRET
-			if (tokenType === constant.REFRESH) secretWord = REFRESH_SECRET
+		if (!model) {
+			throw new ApiError('Model nof found', statusCodes.INTERNAL_SERVER_ERROR)
+		}
+		return model.create(tokensObject)
+	},
+	deleteOneByParams: (filter, modelName = constant.AUTH) => {
+		const model = modelType[modelName]
+
+		if (!model) {
+			throw new ApiError('Model nof found', statusCodes.INTERNAL_SERVER_ERROR)
+		}
+
+		return model.deleteOne(filter)
+	},
+	deleteMany: (filter, modelName = constant.AUTH) => {
+		const model = modelType[modelName]
+
+		if (!model) {
+			throw new ApiError('Model nof found', statusCodes.INTERNAL_SERVER_ERROR)
+		}
+
+		return model.deleteMany(filter)
+	},
+	getOneWithUser: (filter, modelName = constant.AUTH) => {
+		const model = modelType[modelName]
+
+		if (!model) {
+			throw new ApiError('Model nof found', statusCodes.INTERNAL_SERVER_ERROR)
+		}
+		return model.findOne(filter).populate('user')
+	},
+	getOne: (filter, modelName = constant.AUTH) => {
+		const model = modelType[modelName]
+
+		if (!model) {
+			throw new ApiError('Model nof found', statusCodes.INTERNAL_SERVER_ERROR)
+		}
+		return model.findOne(filter)
+	},
+	verifyToken: (token, typeOfToken = tokenType.ACCESS) => {
+		try {
+			let secretWord = REFRESH_SECRET
+
+			switch (typeOfToken) {
+				case tokenType.ACCESS:
+					secretWord = ACCESS_SECRET
+					break
+				case tokenType.REFRESH:
+					secretWord = REFRESH_SECRET
+					break
+				case tokenType.FORGOT_PASS:
+					secretWord = FORGOT_PASS_TOKEN_SECRET
+					break
+				default:
+					throw new ApiError('Token type not found', statusCodes.UNAUTHORIZED)
+			}
+			console.log(secretWord) // Додайте цей рядок для перевірки, який секретний ключ використовується
 
 			return jwt.verify(token, secretWord)
 		} catch (e) {

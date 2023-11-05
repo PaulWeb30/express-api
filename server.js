@@ -11,7 +11,7 @@ const app = express()
 app.use(express.json())
 
 app.use('/auth', authRouter)
-app.use('/user', userRouter)
+app.use('/users', userRouter)
 
 app.use(mainErrorHandler)
 
