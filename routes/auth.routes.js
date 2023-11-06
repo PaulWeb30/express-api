@@ -4,6 +4,8 @@ const AuthController = require('../controllers/auth.controller')
 const {
 	loginValidation,
 	signupValidation,
+	forgotPassEmailValidation,
+	forgotPassNewPassValidation,
 } = require('../validations/auth.validation')
 const { tokenType } = require('../constants')
 
@@ -13,15 +15,13 @@ const router = express.Router()
 
 router.post(
 	'/login',
-	loginValidation,
-	commonMdlwr.handleValidationErrors,
+	commonMdlwr.checkIsBodyValid(loginValidation),
 	userMdlwr.getUserDynamicaly('body', 'email', 'email'),
 	AuthController.login
 )
 router.post(
 	'/signup',
-	signupValidation,
-	commonMdlwr.handleValidationErrors,
+	commonMdlwr.checkIsBodyValid(signupValidation),
 	userMdlwr.checkEmailUniqueness,
 	AuthController.signup
 )
@@ -32,12 +32,14 @@ router.post('/logout', authMdlwr.checkIsAccessToken, AuthController.logout)
 
 router.post(
 	'/password/forgot',
+	commonMdlwr.checkIsBodyValid(forgotPassEmailValidation),
 	userMdlwr.getUserDynamicaly('body', 'email', 'email'),
 	AuthController.forgotPassword
 )
 
 router.patch(
 	'/password/forgot',
+	commonMdlwr.checkIsBodyValid(forgotPassNewPassValidation),
 	authMdlwr.checkIsActionToken(tokenType.FORGOT_PASS),
 	AuthController.setNewPassword
 )

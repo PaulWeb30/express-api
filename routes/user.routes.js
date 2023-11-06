@@ -1,8 +1,7 @@
 const express = require('express')
 
 const UserController = require('../controllers/user.controller')
-const { signupValidation } = require('../validations/auth.validation')
-
+const { updateUserValidation } = require('../validations/auth.validation')
 const { userMdlwr, commonMdlwr, authMdlwr } = require('../middlewares/index')
 
 const router = express.Router()
@@ -17,8 +16,7 @@ router.get(
 router.patch(
 	'/:userId',
 	commonMdlwr.checkIsIdValid('userId'),
-	signupValidation,
-	commonMdlwr.handleValidationErrors,
+	commonMdlwr.checkIsBodyValid(updateUserValidation),
 	userMdlwr.getUserDynamicaly('params', 'userId', '_id'),
 	userMdlwr.checkEmailIsVerified,
 	userMdlwr.checkEmailUniqueness,
