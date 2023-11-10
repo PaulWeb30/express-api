@@ -2,7 +2,11 @@ const { constant, tokenType, statusCodes } = require('../constants')
 
 const { ApiError } = require('../utils')
 
-const { tokenService } = require('../services')
+const {
+	tokenService,
+	previousPasswordService,
+	authService,
+} = require('../services')
 
 module.exports = {
 	checkIsAccessToken: async (req, res, next) => {
@@ -69,6 +73,36 @@ module.exports = {
 			}
 
 			req.tokenInfo = tokenInfo
+			next()
+		} catch (e) {
+			next(e)
+		}
+	},
+	checkIsPreviousPassword: async (req, res, next) => {
+		try {
+			const { password } = req.body
+			const { user } = req.tokenInfo
+
+			const oldPasswords = await previousPasswordService.getAll({
+				user: user._id,
+			})
+
+			console.log(oldPasswords)
+
+			const promises = await Promise.allSettled([
+				...oldPasswords.map(old =>
+					authService.comparePasswords(password, old.password)
+				),
+				authService.comparePasswords(password, user.password),
+			])
+			console.log(promises)
+			for (const { status } of promises) {
+				if (status === 'fulfilled') {
+					return next(
+						new ApiError("Can't use old passwords", statusCodes.BAD_REQUEST)
+					)
+				}
+			}
 			next()
 		} catch (e) {
 			next(e)

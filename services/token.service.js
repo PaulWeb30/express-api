@@ -8,7 +8,6 @@ const {
 	FORGOT_PASS_TOKEN_SECRET,
 } = require('../config/config')
 
-const { AuthModel } = require('../models/index')
 const { ApiError } = require('../utils/index')
 const { statusCodes, modelType, tokenType, constant } = require('../constants')
 
@@ -35,7 +34,7 @@ module.exports = {
 		const model = modelType[modelName]
 
 		if (!model) {
-			throw new ApiError('Model nof found', statusCodes.INTERNAL_SERVER_ERROR)
+			throw new ApiError('Model not found', statusCodes.INTERNAL_SERVER_ERROR)
 		}
 		return model.create(tokensObject)
 	},
@@ -43,7 +42,7 @@ module.exports = {
 		const model = modelType[modelName]
 
 		if (!model) {
-			throw new ApiError('Model nof found', statusCodes.INTERNAL_SERVER_ERROR)
+			throw new ApiError('Model not found', statusCodes.INTERNAL_SERVER_ERROR)
 		}
 
 		return model.deleteOne(filter)

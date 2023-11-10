@@ -3,6 +3,7 @@ const {
 	tokenService,
 	userService,
 	emailService,
+	previousPasswordService,
 } = require('../services/index')
 const {
 	statusCodes,
@@ -142,8 +143,33 @@ module.exports = {
 			const passwordHash = await authService.hashPassword(password)
 			await userService.updateUserById(user._id, { passwordHash })
 
-			await tokenService.deleteMany({ user: user._id })
+			await previousPasswordService.create({
+				password: user.passwordHash,
+				user: user._id,
+			})
+
+			await await tokenService.deleteMany({ user: user._id }, constant.AUTH)
 			await tokenService.deleteOneByParams({ token }, constant.ACTION)
+
+			res.status(statusCodes.OK).json('success')
+		} catch (e) {
+			next(e)
+		}
+	},
+	changePassword: async (req, res, next) => {
+		try {
+			const { password } = req.body
+			const { user } = req.tokenInfo
+
+			const passwordHash = await authService.hashPassword(password)
+			await userService.updateUserById(user._id, { passwordHash })
+
+			await previousPasswordService.create({
+				password: user.passwordHash,
+				user: user._id,
+			})
+
+			await tokenService.deleteMany({ user: user._id }, constant.AUTH)
 
 			res.status(statusCodes.OK).json('success')
 		} catch (e) {

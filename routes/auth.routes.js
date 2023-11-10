@@ -41,7 +41,16 @@ router.patch(
 	'/password/forgot',
 	commonMdlwr.checkIsBodyValid(forgotPassNewPassValidation),
 	authMdlwr.checkIsActionToken(tokenType.FORGOT_PASS),
+	authMdlwr.checkIsPreviousPassword,
 	AuthController.setNewPassword
+)
+
+router.patch(
+	'/password/change',
+	commonMdlwr.checkIsBodyValid(forgotPassNewPassValidation),
+	authMdlwr.checkIsAccessToken,
+	authMdlwr.checkIsPreviousPassword,
+	AuthController.changePassword
 )
 
 router.get(
