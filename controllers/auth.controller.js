@@ -1,3 +1,4 @@
+const { UserModel } = require('../models/')
 const {
 	authService,
 	tokenService,
@@ -16,14 +17,9 @@ const { FRONTEND_URL } = require('../config/config')
 module.exports = {
 	signup: async (req, res, next) => {
 		try {
-			const { email, password } = req.body
+			const { email } = req.body
 
-			const passwordHash = await authService.hashPassword(password)
-
-			const user = await userService.createUser({
-				...req.body,
-				passwordHash,
-			})
+			const user = await UserModel.createUserWithHashPassword(req.body)
 
 			const authTokens = tokenService.generateAuthTokens({ _id: user._id })
 
@@ -57,9 +53,9 @@ module.exports = {
 	login: async (req, res, next) => {
 		try {
 			const { password } = req.body
-			const { passwordHash, _id } = req.user
+			const { _id } = req.user
 
-			await authService.comparePasswords(password, passwordHash)
+			await req.user.isPasswordsSame(password)
 
 			const authTokens = tokenService.generateAuthTokens({ _id })
 

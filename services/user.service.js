@@ -1,9 +1,6 @@
 const { UserModel } = require('../models/index')
 
 module.exports = {
-	createUser: userObject => {
-		return UserModel.create(userObject)
-	},
 	getAll: () => {
 		return UserModel.find().select('-passwordHash')
 	},

@@ -1,5 +1,7 @@
 const { Schema, model } = require('mongoose')
 
+const authService = require('../services/auth.service')
+
 const UserSchema = new Schema(
 	{
 		fullName: {
@@ -28,5 +30,22 @@ const UserSchema = new Schema(
 		versionKey: false,
 	}
 )
+
+UserSchema.statics = {
+	async createUserWithHashPassword(userObject) {
+		const passwordHash = await authService.hashPassword(userObject.password)
+
+		return this.create({
+			...userObject,
+			passwordHash,
+		})
+	},
+}
+
+UserSchema.methods = {
+	async isPasswordsSame(password) {
+		await authService.comparePasswords(password, this.passwordHash)
+	},
+}
 
 module.exports = model('User', UserSchema)
