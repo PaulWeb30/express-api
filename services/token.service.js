@@ -51,7 +51,7 @@ module.exports = {
 		const model = modelType[modelName]
 
 		if (!model) {
-			throw new ApiError('Model nof found', statusCodes.INTERNAL_SERVER_ERROR)
+			throw new ApiError('Model not found', statusCodes.INTERNAL_SERVER_ERROR)
 		}
 
 		return model.deleteMany(filter)
@@ -60,7 +60,7 @@ module.exports = {
 		const model = modelType[modelName]
 
 		if (!model) {
-			throw new ApiError('Model nof found', statusCodes.INTERNAL_SERVER_ERROR)
+			throw new ApiError('Model not found', statusCodes.INTERNAL_SERVER_ERROR)
 		}
 		return model.findOne(filter).populate('user')
 	},
@@ -68,7 +68,7 @@ module.exports = {
 		const model = modelType[modelName]
 
 		if (!model) {
-			throw new ApiError('Model nof found', statusCodes.INTERNAL_SERVER_ERROR)
+			throw new ApiError('Model not found', statusCodes.INTERNAL_SERVER_ERROR)
 		}
 		return model.findOne(filter)
 	},

@@ -12,7 +12,7 @@ const {
 	tokenType,
 	constant,
 } = require('../constants')
-const { FRONTEND_URL } = require('../config/config')
+const { FRONTEND_URL, BASE_URL } = require('../config/config')
 
 module.exports = {
 	signup: async (req, res, next) => {
@@ -37,7 +37,7 @@ module.exports = {
 				constant.ACTION
 			)
 
-			const url = `http://localhost:4444/api/auth/email/verification/${user._id}/${action_token}`
+			const url = `${BASE_URL}/auth/email/verification/${user._id}/${action_token}`
 			await emailService.sendEmail(email, emailAction.EMAIL_VERIFICATION, {
 				url,
 			})

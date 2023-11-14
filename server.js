@@ -5,6 +5,7 @@ require('dotenv').config()
 const allRoutes = require('./routes')
 const { PORT, DB_URL } = require('./config/config')
 const { mainErrorHandler } = require('./utils')
+const runCronJobs = require('./cron')
 
 const app = express()
 
@@ -24,6 +25,7 @@ const startServer = async () => {
 		app.listen(PORT, () =>
 			console.log(`Server successfully started on ${PORT} port`)
 		)
+		runCronJobs()
 	} catch (e) {
 		console.error('Server error', e.message)
 	}
