@@ -1,12 +1,17 @@
 const express = require('express')
 
 const UserController = require('../controllers/user.controller')
+const { UserModel } = require('../models')
 const { updateUserValidation } = require('../validations/auth.validation')
 const { userMdlwr, commonMdlwr, authMdlwr } = require('../middlewares/index')
 
 const router = express.Router()
 
-router.get('/', UserController.getAll)
+router.get(
+	'/',
+	commonMdlwr.getPaginationObject(UserModel),
+	UserController.getAll
+)
 router.get(
 	'/:userId',
 	commonMdlwr.checkIsIdValid('userId'),

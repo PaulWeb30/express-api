@@ -4,9 +4,11 @@ const { statusCodes } = require('../constants')
 module.exports = {
 	getAll: async (req, res, next) => {
 		try {
-			const users = await userService.getAll()
+			const pagination = req.pagination
 
-			res.status(statusCodes.OK).json(users)
+			const users = await userService.getAll(pagination)
+
+			res.status(statusCodes.OK).json({ users, pagination })
 		} catch (e) {
 			next(e)
 		}

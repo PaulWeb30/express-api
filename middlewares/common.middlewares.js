@@ -38,4 +38,30 @@ module.exports = {
 			}
 		}
 	},
+	getPaginationObject: model => {
+		return async (req, res, next) => {
+			try {
+				const page = Number(req.query.page) || 1
+				const pageSize = Number(req.query.pageSize) || 10
+				const skipAmount = (page - 1) * pageSize
+
+				const totalCount = await model.countDocuments()
+				const totalPages = Math.ceil(totalCount / pageSize)
+
+				const pagination = {
+					pageSize,
+					currentPage: page,
+					totalPages,
+					totalCount,
+					skipAmount,
+				}
+
+				req.pagination = pagination
+
+				next()
+			} catch (e) {
+				return next(new ApiError('Pagination error', BAD_REQUEST))
+			}
+		}
+	},
 }

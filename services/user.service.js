@@ -1,11 +1,15 @@
 const { UserModel } = require('../models/index')
 
 module.exports = {
-	getAll: () => {
-		return UserModel.find().select('-passwordHash')
+	getAll: ({ skipAmount, pageSize }) => {
+		return UserModel.find()
+			.skip(skipAmount)
+			.limit(pageSize)
+			.select('-passwordHash')
+			.exec()
 	},
 	getOneByParams: filter => {
-		return UserModel.findOne(filter)
+		return UserModel.findOne(filter).select('-passwordHash')
 	},
 	deleteUser: filter => {
 		return UserModel.deleteOne(filter)
